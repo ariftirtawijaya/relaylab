@@ -4,6 +4,7 @@ require_once __DIR__ . '/app/db.php';
 require_once __DIR__ . '/app/helpers.php';
 require_once __DIR__ . '/app/time.php';
 require_once __DIR__ . '/app/geo.php';
+require_once __DIR__ . '/app/mail.php';
 require_once __DIR__ . '/app/settings.php';
 require_role('pegawai');
 
@@ -93,6 +94,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $lat ?: null, $lng ?: null,
             $geo_required ? 1 : null
         ]);
+
+        // 🔔 Notifikasi Telegram Absen Masuk
+        if (!empty($user)) {
+            telegram_notify_attendance(
+                'in',
+                $user['name'] ?? '',
+                $user['employee_id'] ?? '',
+                $now->format('Y-m-d H:i:s')
+            );
+        }
         flash_set('success', 'Absen Masuk Berhasil');
         header('Location: ' . url('/pegawai.php')); exit;
     }
@@ -118,6 +129,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $geo_required ? 1 : null,
             $uid, $ymd
         ]);
+        
+        // 🔔 Notifikasi Telegram Absen Pulang
+        if (!empty($user)) {
+            telegram_notify_attendance(
+                'out',
+                $user['name'] ?? '',
+                $user['employee_id'] ?? '',
+                $now->format('Y-m-d H:i:s')
+            );
+        }
         flash_set('success', 'Absen Pulang Berhasil');
         header('Location: ' . url('/pegawai.php')); exit;
     }
