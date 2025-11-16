@@ -38,7 +38,7 @@ require_role('pegawai');
 </head>
 
 <body>
-    
+
     <!-- Preloader -->
     <div id="preloader">
         <div class="spinner-grow text-primary" role="status">
@@ -77,8 +77,7 @@ require_role('pegawai');
             <div class="card user-info-card mb-3 shadow-sm">
                 <div class="card-body d-flex align-items-center">
                     <div class="user-profile me-3">
-                        <img src="assets/img/profile.png"
-                            alt="">
+                        <img src="assets/img/profile.png" alt="">
                         <!-- <form action="#">
                             <input class="form-control" type="file">
                         </form> -->
@@ -100,12 +99,14 @@ require_role('pegawai');
                             Ubah Password
                         </a>
                     </div>
-<div class="single-setting-panel">
+                    <div class="single-setting-panel">
                         <a href="/pegawai_kasbon.php">
                             <div class="icon-wrapper bg-info">
                                 <i class="bi bi-cash"></i>
                             </div>
                             Kasbon
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">Baru</span>
                         </a>
                     </div>
                     <div class="single-setting-panel">
