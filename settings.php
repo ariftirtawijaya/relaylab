@@ -105,8 +105,6 @@ require_role('pegawai');
                                 <i class="bi bi-cash"></i>
                             </div>
                             Kasbon
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">Baru</span>
                         </a>
                     </div>
                     <div class="single-setting-panel">
