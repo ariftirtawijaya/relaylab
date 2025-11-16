@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Register Form -->
             <div class="register-form mt-4">
-                <h6 class="mb-3 text-center">Masuk untuk presensi</h6>
+                <h6 class="mb-3 text-center">Masuk untuk presensi!!!!!!!!!!!!!</h6>
 
                 <form method="post">
                     <div class="form-group">
