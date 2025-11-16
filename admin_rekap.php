@@ -49,16 +49,25 @@ foreach ($rows as $r) {
   $out = $r['out_time'] ? new DateTime($r['out_time']) : null;
 
   $late_h = $in ? calc_late_hours($in) : 0;
-  $ot_min = $out ? calc_overtime_minutes($out) : 0;
 
-  $mult = ot_get_multiplier($d); // <-- multiplier per tanggal
+  // === LEMBUR: pakai fungsi record-aware (hari biasa vs Minggu) ===
+  $ot_min = calc_overtime_minutes_record($d, $r['in_time'], $r['out_time']);
+
+  $mult = ot_get_multiplier($d); // multiplier per tanggal
   $fine = $late_h * LATE_FINE_PER_H;
-  $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult); // pakai multiplier
+  $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult);
   $net = $otpay - $fine;
 
   $key = $r['employee_id'] . '|' . $r['name'];
-  if (!isset($summary[$key]))
-    $summary[$key] = ['late_h' => 0, 'fine' => 0, 'ot_min' => 0, 'otpay' => 0, 'net' => 0];
+  if (!isset($summary[$key])) {
+    $summary[$key] = [
+      'late_h' => 0,
+      'fine' => 0,
+      'ot_min' => 0,
+      'otpay' => 0,
+      'net' => 0,
+    ];
+  }
   $summary[$key]['late_h'] += $late_h;
   $summary[$key]['fine'] += $fine;
   $summary[$key]['ot_min'] += $ot_min;
@@ -127,7 +136,6 @@ foreach ($rows as $r) {
           <label class="form-label">Bulan</label>
           <input type="month" name="bulan" class="form-control" value="<?= htmlspecialchars($bulan) ?>"
             onchange="this.form.submit()">
-
         </div>
       <?php else: ?>
         <div class="col-md-3">
@@ -136,7 +144,6 @@ foreach ($rows as $r) {
             onchange="this.form.submit()">
           <?php if ($mode === 'week'): ?>
             <small class="text-muted"><?= htmlspecialchars($period_label) ?></small>
-
           <?php endif; ?>
         </div>
       <?php endif; ?>
@@ -183,7 +190,7 @@ foreach ($rows as $r) {
         <tbody>
           <?php if (!$detail): ?>
             <tr>
-              <td colspan="10" class="text-center text-muted">Tidak ada data.</td>
+              <td colspan="11" class="text-center text-muted">Tidak ada data.</td>
             </tr>
           <?php else:
             foreach ($detail as $d): ?>

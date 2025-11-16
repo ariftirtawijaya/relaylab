@@ -33,11 +33,13 @@ foreach ($rows as $r) {
     $out = $r['out_time'] ? new DateTime($r['out_time']) : null;
 
     $late_h = $in ? calc_late_hours($in) : 0;
-    $ot_min = $out ? calc_overtime_minutes($out) : 0;
 
-    $mult = ot_get_multiplier($r['work_date']); // <-- multiplier
+    // === LEMBUR: pakai fungsi record-aware (hari biasa vs Minggu) ===
+    $ot_min = calc_overtime_minutes_record($d, $r['in_time'], $r['out_time']);
+
+    $mult = ot_get_multiplier($r['work_date']);
     $fine = $late_h * LATE_FINE_PER_H;
-    $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult); // pakai multiplier
+    $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult);
     $net = $otpay - $fine;
 
     $tot_late_h += $late_h;
@@ -63,7 +65,7 @@ $summary = [
     'fine' => $tot_fine,
     'ot_min' => $tot_ot_min,
     'otpay' => $tot_otpay,
-    'net' => $tot_otpay - $tot_fine
+    'net' => $tot_otpay - $tot_fine,
 ];
 ?>
 <!DOCTYPE html>
@@ -75,23 +77,19 @@ $summary = [
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="RelayLab - SuperApp">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <meta name="theme-color" content="#264655">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-    <!-- Title -->
     <title>RelayLab - Presensi</title>
 
-    <!-- Favicon -->
     <link rel="icon" href="assets/img/favicon.ico">
     <link rel="apple-touch-icon" href="assets/img/icon-96x96.png">
     <link rel="apple-touch-icon" sizes="152x152" href="assets/img/icon-152x152.png">
     <link rel="apple-touch-icon" sizes="167x167" href="assets/img/icon-167x167.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/icon-180x180.png">
 
-    <!-- Style CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="manifest" href="manifest.json">
 
@@ -99,35 +97,23 @@ $summary = [
 
 <body>
 
-    <!-- Preloader -->
     <div id="preloader">
         <div class="spinner-grow text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
 
-    <!-- Internet Connection Status -->
     <div class="internet-connection-status" id="internetStatus"></div>
 
-    <!-- Header Area-->
     <div class="header-area" id="headerArea">
         <div class="container">
-            <!-- Header Content-->
             <div
                 class="header-content header-style-four position-relative d-flex align-items-center justify-content-between">
-                <!-- Back Button-->
-                <div class="back-button">
-
-                </div>
-
-                <!-- Page Title-->
+                <div class="back-button"></div>
                 <div class="page-heading">
                     <h6 class="mb-0">Rekap</h6>
                 </div>
-
-                <!-- User Profile-->
-                <div class="user-profile-wrapper">
-                </div>
+                <div class="user-profile-wrapper"></div>
             </div>
         </div>
     </div>
@@ -169,6 +155,7 @@ $summary = [
                 </div>
             </div>
         </div>
+
         <div class="pt-3"></div>
 
         <div class="container">
@@ -192,7 +179,7 @@ $summary = [
                             <tbody>
                                 <?php if (!$detail): ?>
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted">Tidak ada data</td>
+                                        <td colspan="9" class="text-center text-muted">Tidak ada data</td>
                                     </tr>
                                 <?php else:
                                     foreach ($detail as $d): ?>
@@ -204,11 +191,11 @@ $summary = [
                                             <td class="text-nowrap"><?= number_format($d['fine'], 0, ',', '.') ?></td>
                                             <td class="text-nowrap"><?= fmt_duration_hm($d['ot_min']) ?></td>
                                             <td class="text-nowrap">
-                                                x<?= rtrim(rtrim(number_format($d['mult'], 2, ',', '.'), '0'), ',') ?></td>
+                                                x<?= rtrim(rtrim(number_format($d['mult'], 2, ',', '.'), '0'), ',') ?>
+                                            </td>
                                             <td class="text-nowrap"><?= number_format($d['otpay'], 0, ',', '.') ?></td>
                                             <td class="text-nowrap">
-                                                <strong><?= number_format($d['net'], 0, ',', '.') ?></strong>
-                                            </td>
+                                                <strong><?= number_format($d['net'], 0, ',', '.') ?></strong></td>
                                         </tr>
                                     <?php endforeach; endif; ?>
                             </tbody>
@@ -218,6 +205,7 @@ $summary = [
                 </div>
             </div>
         </div>
+
         <div class="pt-3"></div>
 
         <div class="container">
@@ -255,7 +243,6 @@ $summary = [
     <!-- Footer Nav -->
     <div class="footer-nav-area" id="footerNav">
         <div class="container px-0">
-            <!-- Footer Content -->
             <div class="footer-nav position-relative">
                 <ul class="h-100 d-flex align-items-center justify-content-between ps-0">
                     <li>
@@ -264,16 +251,15 @@ $summary = [
                             <span>Beranda</span>
                         </a>
                     </li>
-
-                    <li>
+                    <li class="active">
                         <a href="/pegawai_rekap.php">
-                            <i class=" bi bi-calendar2-check"></i>
+                            <i class="bi bi-calendar2-check"></i>
                             <span>Rekap</span>
                         </a>
                     </li>
-                    <li class="active">
+                    <li>
                         <a href="/settings.php">
-                            <i class=" bi bi-person"></i>
+                            <i class="bi bi-person"></i>
                             <span>Profil</span>
                         </a>
                     </li>
@@ -298,3 +284,5 @@ $summary = [
     <script src="assets/js/dark-rtl.js"></script>
     <script src="assets/js/active.js"></script>
 </body>
+
+</html>
