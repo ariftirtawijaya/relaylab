@@ -1,0 +1,147 @@
+[06-Nov-2025 21:04:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function url() in /home/pupq3195/public_html/relaylab/settings.php:77
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/settings.php on line 77
+[15-Nov-2025 23:59:48 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[15-Nov-2025 23:59:48 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:06 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:06 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:12 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:12 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:39 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:39 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:40 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:40 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:45 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:45 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:52 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:00:52 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:01:42 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:01:42 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:01:50 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:01:50 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:25 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:25 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:25 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:25 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:26 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:27 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:27 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:27 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:27 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:28 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:28 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:28 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:28 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:29 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:29 Asia/Jakarta] PHP Warning:  require_once(/home/pupq3195/public_html/relaylab/app/upload.php): Failed to open stream: No such file or directory in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:02:29 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Failed opening required '/home/pupq3195/public_html/relaylab/app/upload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/pupq3195/public_html/relaylab/admin_kasbon.php:5
+Stack trace:
+#0 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 5
+[16-Nov-2025 00:03:46 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'pupq3195_presensi.cash_advances' doesn't exist in /home/pupq3195/public_html/relaylab/admin_kasbon.php:74
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/admin_kasbon.php(74): PDOStatement->execute()
+#1 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 74
+[16-Nov-2025 00:03:49 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'pupq3195_presensi.cash_advances' doesn't exist in /home/pupq3195/public_html/relaylab/admin_kasbon.php:74
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/admin_kasbon.php(74): PDOStatement->execute()
+#1 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 74
+[16-Nov-2025 00:03:50 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'pupq3195_presensi.cash_advances' doesn't exist in /home/pupq3195/public_html/relaylab/admin_kasbon.php:74
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/admin_kasbon.php(74): PDOStatement->execute()
+#1 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 74
+[16-Nov-2025 00:03:50 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'pupq3195_presensi.cash_advances' doesn't exist in /home/pupq3195/public_html/relaylab/admin_kasbon.php:74
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/admin_kasbon.php(74): PDOStatement->execute()
+#1 {main}
+  thrown in /home/pupq3195/public_html/relaylab/admin_kasbon.php on line 74
+[16-Nov-2025 00:17:39 Asia/Jakarta] PHP Parse error:  syntax error, unexpected token "<", expecting end of file in /home/pupq3195/public_html/relaylab/pegawai_kasbon.php on line 51
+[16-Nov-2025 00:22:30 Asia/Jakarta] Kasbon mail error: SMTP Error: Could not connect to SMTP host.
+[16-Nov-2025 11:13:57 Asia/Jakarta] Telegram notify error: Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 153
