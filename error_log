@@ -145,3 +145,46 @@ Stack trace:
 [16-Nov-2025 00:17:39 Asia/Jakarta] PHP Parse error:  syntax error, unexpected token "<", expecting end of file in /home/pupq3195/public_html/relaylab/pegawai_kasbon.php on line 51
 [16-Nov-2025 00:22:30 Asia/Jakarta] Kasbon mail error: SMTP Error: Could not connect to SMTP host.
 [16-Nov-2025 11:13:57 Asia/Jakarta] Telegram notify error: Bad Request: can't parse entities: Can't find end of the entity starting at byte offset 153
+[20-Nov-2025 08:10:50 Asia/Jakarta] Telegram error (curl): Too Many Requests: retry after 5
+[25-Nov-2025 20:18:52 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [2002] Can't connect to local server through socket '/var/lib/mysql/mysql.sock' (2) in /home/pupq3195/public_html/relaylab/app/db.php:9
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/app/db.php(9): PDO->__construct()
+#1 /home/pupq3195/public_html/relaylab/admin_kasbon.php(73): pdo()
+#2 {main}
+  thrown in /home/pupq3195/public_html/relaylab/app/db.php on line 9
+[25-Nov-2025 20:18:54 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [2002] Can't connect to local server through socket '/var/lib/mysql/mysql.sock' (2) in /home/pupq3195/public_html/relaylab/app/db.php:9
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/app/db.php(9): PDO->__construct()
+#1 /home/pupq3195/public_html/relaylab/admin_kasbon.php(73): pdo()
+#2 {main}
+  thrown in /home/pupq3195/public_html/relaylab/app/db.php on line 9
+[25-Nov-2025 20:18:57 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [2002] Can't connect to local server through socket '/var/lib/mysql/mysql.sock' (2) in /home/pupq3195/public_html/relaylab/app/db.php:9
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/app/db.php(9): PDO->__construct()
+#1 /home/pupq3195/public_html/relaylab/admin_kasbon.php(73): pdo()
+#2 {main}
+  thrown in /home/pupq3195/public_html/relaylab/app/db.php on line 9
+[25-Nov-2025 20:18:59 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [2002] Can't connect to local server through socket '/var/lib/mysql/mysql.sock' (2) in /home/pupq3195/public_html/relaylab/app/db.php:9
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/app/db.php(9): PDO->__construct()
+#1 /home/pupq3195/public_html/relaylab/admin_kasbon.php(73): pdo()
+#2 {main}
+  thrown in /home/pupq3195/public_html/relaylab/app/db.php on line 9
+[25-Nov-2025 20:19:00 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [2002] Can't connect to local server through socket '/var/lib/mysql/mysql.sock' (2) in /home/pupq3195/public_html/relaylab/app/db.php:9
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/app/db.php(9): PDO->__construct()
+#1 /home/pupq3195/public_html/relaylab/admin_kasbon.php(73): pdo()
+#2 {main}
+  thrown in /home/pupq3195/public_html/relaylab/app/db.php on line 9
+[25-Nov-2025 20:19:02 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [2002] Can't connect to local server through socket '/var/lib/mysql/mysql.sock' (2) in /home/pupq3195/public_html/relaylab/app/db.php:9
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/app/db.php(9): PDO->__construct()
+#1 /home/pupq3195/public_html/relaylab/admin_kasbon.php(73): pdo()
+#2 {main}
+  thrown in /home/pupq3195/public_html/relaylab/app/db.php on line 9
+[25-Nov-2025 20:19:05 Asia/Jakarta] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY000] [2002] Can't connect to local server through socket '/var/lib/mysql/mysql.sock' (2) in /home/pupq3195/public_html/relaylab/app/db.php:9
+Stack trace:
+#0 /home/pupq3195/public_html/relaylab/app/db.php(9): PDO->__construct()
+#1 /home/pupq3195/public_html/relaylab/admin_kasbon.php(73): pdo()
+#2 {main}
+  thrown in /home/pupq3195/public_html/relaylab/app/db.php on line 9
