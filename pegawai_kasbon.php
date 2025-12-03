@@ -3,6 +3,7 @@ require_once __DIR__ . '/app/auth.php';
 require_once __DIR__ . '/app/db.php';
 require_once __DIR__ . '/app/helpers.php';
 require_once __DIR__ . '/app/mail.php';
+require_once __DIR__ . '/app/kasbon.php';
 require_role('pegawai');
 
 $uid = me_id();
@@ -11,20 +12,64 @@ $uid = me_id();
 $stUser = pdo()->prepare("SELECT employee_id, name FROM users WHERE id=? LIMIT 1");
 $stUser->execute([$uid]);
 $user = $stUser->fetch();
-$empId   = $user ? ($user['employee_id'] ?? '') : '';
+$empId = $user ? ($user['employee_id'] ?? '') : '';
 $empName = $user ? ($user['name'] ?? '') : '';
 
-if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['ajukan'])) {
-    $amount = max(0, intval(str_replace(['.',',',' '], '', $_POST['amount'] ?? '0')));
-    $note   = trim($_POST['note'] ?? '');
+// info limit kasbon bulan ini (berdasarkan decided_at)
+$kinfo = kasbon_limit_info($uid);
+$salary = $kinfo['salary'];
+$maxPct = $kinfo['pct'];
+$maxKasbon = $kinfo['limit'];
+$usedKasbon = $kinfo['used'];
+$sisaLimit = $kinfo['remain'];
+$currentYm = $kinfo['ym'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajukan'])) {
+    $amount = max(0, intval(str_replace(['.', ',', ' '], '', $_POST['amount'] ?? '0')));
+    $note = trim($_POST['note'] ?? '');
 
     if ($amount < 1) {
         flash_set('error', 'Nominal kasbon tidak valid.');
-        header('Location: '.url('/pegawai_kasbon.php')); exit;
+        header('Location: ' . url('/pegawai_kasbon.php'));
+        exit;
+    }
+
+    // ambil ulang limit (supaya fresh)
+    $kinfoPost = kasbon_limit_info($uid);
+    if ($kinfoPost['salary'] <= 0) {
+        flash_set('error', 'Gaji Anda belum diset oleh Admin. Kasbon belum dapat diajukan.');
+        header('Location: ' . url('/pegawai_kasbon.php'));
+        exit;
+    }
+
+    if ($kinfoPost['remain'] <= 0) {
+        flash_set(
+            'error',
+            'Limit kasbon bulan ini sudah habis. ' .
+            'Batas: Rp ' . number_format($kinfoPost['limit'], 0, ',', '.') .
+            ', sudah disetujui: Rp ' . number_format($kinfoPost['used'], 0, ',', '.')
+        );
+        header('Location: ' . url('/pegawai_kasbon.php'));
+        exit;
+    }
+
+    if ($amount > $kinfoPost['remain']) {
+        flash_set(
+            'error',
+            'Pengajuan kasbon melebihi batas. ' .
+            'Batas bulan ini: Rp ' . number_format($kinfoPost['limit'], 0, ',', '.') .
+            ', sudah disetujui: Rp ' . number_format($kinfoPost['used'], 0, ',', '.') .
+            ', sisa limit: Rp ' . number_format($kinfoPost['remain'], 0, ',', '.')
+        );
+        header('Location: ' . url('/pegawai_kasbon.php'));
+        exit;
     }
 
     // simpan kasbon
-    $st = pdo()->prepare("INSERT INTO cash_advances(user_id,amount,note,status,requested_at) VALUES(?,?,?,?,?)");
+    $st = pdo()->prepare("
+        INSERT INTO cash_advances(user_id,amount,note,status,requested_at) 
+        VALUES(?,?,?,?,?)
+    ");
     $st->execute([
         $uid,
         $amount,
@@ -35,20 +80,14 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['ajukan'])) {
 
     $kasbonId = (int) pdo()->lastInsertId();
 
-    // ambil data user untuk info nama/ID
-    $stUser = pdo()->prepare("SELECT employee_id, name FROM users WHERE id=? LIMIT 1");
-    $stUser->execute([$uid]);
-    $user = $stUser->fetch();
-    $empId   = $user ? ($user['employee_id'] ?? '') : '';
-    $empName = $user ? ($user['name'] ?? '') : '';
-
     // 🔔 KIRIM NOTIFIKASI (EMAIL + TELEGRAM)
     if ($empName || $empId) {
         notify_admin_kasbon_new($empName, $empId, $amount, $note, $kasbonId);
     }
 
-    flash_set('success','Pengajuan kasbon terkirim. Menunggu verifikasi Admin.');
-    header('Location: '.url('/pegawai_kasbon.php')); exit;
+    flash_set('success', 'Pengajuan kasbon terkirim. Menunggu verifikasi Admin.');
+    header('Location: ' . url('/pegawai_kasbon.php'));
+    exit;
 }
 
 // ambil daftar kasbon saya (terbaru dulu)
@@ -65,7 +104,6 @@ $rows = $st->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="RelayLab - SuperApp">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <meta name="theme-color" content="#264655">
     <meta name="mobile-web-app-capable" content="yes">
@@ -103,22 +141,13 @@ $rows = $st->fetchAll();
     <!-- Header Area-->
     <div class="header-area" id="headerArea">
         <div class="container">
-            <!-- Header Content-->
             <div
                 class="header-content header-style-four position-relative d-flex align-items-center justify-content-between">
-                <!-- Back Button-->
-                <div class="back-button">
-
-                </div>
-
-                <!-- Page Title-->
+                <div class="back-button"></div>
                 <div class="page-heading">
                     <h6 class="mb-0">Kasbon</h6>
                 </div>
-
-                <!-- User Profile-->
-                <div class="user-profile-wrapper">
-                </div>
+                <div class="user-profile-wrapper"></div>
             </div>
         </div>
     </div>
@@ -128,25 +157,54 @@ $rows = $st->fetchAll();
             <div class="card">
                 <div class="card-body">
                     <h5 class="">Ajukan Kasbon</h5>
+
+                    <?php if ($salary > 0): ?>
+                            <div class="alert alert-info">
+                                <div><strong>Periode:</strong> <?= htmlspecialchars($currentYm) ?></div>
+                                <div><strong>Batas Kasbon <?= (int) $maxPct ?>% dari gaji:</strong> Rp
+                                    <?= number_format($maxKasbon, 0, ',', '.') ?>
+                                </div>
+                                <div><strong>Sudah Disetujui Bulan Ini:</strong> Rp
+                                    <?= number_format($usedKasbon, 0, ',', '.') ?>
+                                </div>
+                                <div><strong>Sisa Limit:</strong> Rp
+                                    <?= number_format($sisaLimit, 0, ',', '.') ?>
+                                </div>
+                                <?php if ($sisaLimit <= 0): ?>
+                                        <div class="mt-1 text-danger"><strong>Limit kasbon bulan ini sudah habis.</strong></div>
+                                <?php endif; ?>
+                            </div>
+                    <?php else: ?>
+                            <div class="alert alert-warning">
+                                Gaji Anda belum diset oleh Admin. Pengajuan kasbon akan otomatis ditolak sampai gaji
+                                diinput.
+                            </div>
+                    <?php endif; ?>
+
                     <form method="post" class="row g-2" autocomplete="off">
                         <div class="col-12">
                             <label class="form-label">Nominal</label>
-                            <input type="number" class="form-control" name="amount" min="1" placeholder="contoh: 200000"
-                                required>
+                            <input type="number" class="form-control" name="amount" min="1"
+                                placeholder="contoh: 200000" required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Catatan (opsional)</label>
-                            <input type="text" class="form-control" name="note" maxlength="255"
+                            <label class="form-label">Catatan (Wajib)</label>
+                            <input type="text" class="form-control" required name="note" maxlength="255"
                                 placeholder="Keperluan kasbon">
                         </div>
                         <div class="col-12">
-                            <button class="btn btn-primary w-100" name="ajukan" value="1">Ajukan</button>
+                            <button class="btn btn-primary w-100" name="ajukan" value="1"
+                                <?= ($salary <= 0 || $sisaLimit <= 0) ? 'disabled' : '' ?>>
+                                Ajukan
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+
         <div class="pt-3"></div>
+
         <div class="container">
             <div class="card">
                 <div class="card-body">
@@ -166,37 +224,37 @@ $rows = $st->fetchAll();
                             </thead>
                             <tbody>
                                 <?php foreach ($rows as $r): ?>
-                                    <tr>
-                                        <td><?= (int) $r['id'] ?></td>
-                                        <td>Rp <?= number_format((int) $r['amount'], 0, ',', '.') ?></td>
-                                        <td>
-                                            <?php if ($r['status'] === 'pending'): ?>
-                                                <span class="badge text-bg-secondary">Pending</span>
-                                            <?php elseif ($r['status'] === 'approved'): ?>
-                                                <span class="badge text-bg-success">Disetujui</span>
-                                            <?php else: ?>
-                                                <span class="badge text-bg-danger">Ditolak</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?= fmt_datetime($r['requested_at']) ?></td>
-                                        <td><?= $r['decided_at'] ? fmt_datetime($r['decided_at']) : '-' ?></td>
-                                        <td>
-                                            <?php if ($r['status'] === 'approved' && !empty($r['proof_file'])): ?>
-                                                <button type="button" class="btn btn-sm btn-outline-primary"
-                                                    onclick="showProof('<?= htmlspecialchars($r['proof_file']) ?>')">
-                                                    Lihat
-                                                </button>
-                                            <?php else: ?>
-                                                -
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?= htmlspecialchars($r['admin_note'] ?? '') ?></td>
-                                    </tr>
+                                        <tr>
+                                            <td><?= (int) $r['id'] ?></td>
+                                            <td>Rp <?= number_format((int) $r['amount'], 0, ',', '.') ?></td>
+                                            <td>
+                                                <?php if ($r['status'] === 'pending'): ?>
+                                                        <span class="badge text-bg-secondary">Pending</span>
+                                                <?php elseif ($r['status'] === 'approved'): ?>
+                                                        <span class="badge text-bg-success">Disetujui</span>
+                                                <?php else: ?>
+                                                        <span class="badge text-bg-danger">Ditolak</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?= fmt_datetime($r['requested_at']) ?></td>
+                                            <td><?= $r['decided_at'] ? fmt_datetime($r['decided_at']) : '-' ?></td>
+                                            <td>
+                                                <?php if ($r['status'] === 'approved' && !empty($r['proof_file'])): ?>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                                            onclick="showProof('<?= htmlspecialchars($r['proof_file']) ?>')">
+                                                            Lihat
+                                                        </button>
+                                                <?php else: ?>
+                                                        -
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?= htmlspecialchars($r['note'] ?? '') ?></td>
+                                        </tr>
                                 <?php endforeach;
                                 if (!$rows): ?>
-                                    <tr>
-                                        <td colspan="7" class="text-center text-muted">Belum ada pengajuan.</td>
-                                    </tr>
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">Belum ada pengajuan.</td>
+                                        </tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
@@ -205,29 +263,26 @@ $rows = $st->fetchAll();
             </div>
         </div>
     </div>
-    </div>
 
     <!-- Footer Nav -->
     <div class="footer-nav-area" id="footerNav">
         <div class="container px-0">
-            <!-- Footer Content -->
             <div class="footer-nav position-relative">
                 <ul class="h-100 d-flex align-items-center justify-content-between ps-0">
                     <li>
-                        <a href="/pegawai.php">
+                        <a href="<?= url('/pegawai.php') ?>">
                             <i class="bi bi-house"></i>
                             <span>Beranda</span>
                         </a>
                     </li>
-
                     <li>
-                        <a href="/pegawai_rekap.php">
+                        <a href="<?= url('/pegawai_rekap.php') ?>">
                             <i class="bi bi-calendar2-check"></i>
                             <span>Rekap</span>
                         </a>
                     </li>
                     <li class="active">
-                        <a href="/settings.php">
+                        <a href="<?= url('/settings.php') ?>">
                             <i class="bi bi-person"></i>
                             <span>Profil</span>
                         </a>
@@ -236,101 +291,7 @@ $rows = $st->fetchAll();
             </div>
         </div>
     </div>
-    <!--   <nav class="navbar navbar-light bg-light">
-        <div class="container">
-            <span class="navbar-brand">Kasbon Saya</span>
-            <div class="d-flex gap-2">
-                <a class="btn btn-outline-primary" href="<?= url('/pegawai.php') ?>">Presensi</a>
-                <a class="btn btn-outline-primary" href="<?= url('/pegawai_rekap.php') ?>">Rekap</a>
-                <a class="btn btn-outline-primary" href="<?= url('/pegawai_password.php') ?>">Ubah Password</a>
-                <a class="btn btn-outline-secondary" href="<?= url('/logout.php') ?>">Logout</a>
-            </div>
-        </div>
-    </nav>
 
-    <div class="container py-4">
-
-       <div class="row g-3">
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">Ajukan Kasbon</div>
-                    <div class="card-body">
-                        <form method="post" class="row g-2" autocomplete="off">
-                            <div class="col-12">
-                                <label class="form-label">Nominal</label>
-                                <input type="number" class="form-control" name="amount" min="1"
-                                    placeholder="contoh: 200000" required>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Catatan (opsional)</label>
-                                <input type="text" class="form-control" name="note" maxlength="255"
-                                    placeholder="Keperluan kasbon">
-                            </div>
-                            <div class="col-12">
-                                <button class="btn btn-primary w-100" name="ajukan" value="1">Ajukan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header">Riwayat Pengajuan</div>
-                    <div class="card-body table-responsive">
-                        <table class="table table-sm table-striped align-middle">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Nominal</th>
-                                    <th>Status</th>
-                                    <th>Diajukan</th>
-                                    <th>Diputuskan</th>
-                                    <th>Bukti</th>
-                                    <th>Catatan Admin</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($rows as $r): ?>
-                                    <tr>
-                                        <td><?= (int) $r['id'] ?></td>
-                                        <td>Rp <?= number_format((int) $r['amount'], 0, ',', '.') ?></td>
-                                        <td>
-                                            <?php if ($r['status'] === 'pending'): ?>
-                                                <span class="badge text-bg-secondary">Pending</span>
-                                            <?php elseif ($r['status'] === 'approved'): ?>
-                                                <span class="badge text-bg-success">Disetujui</span>
-                                            <?php else: ?>
-                                                <span class="badge text-bg-danger">Ditolak</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?= fmt_datetime($r['requested_at']) ?></td>
-                                        <td><?= $r['decided_at'] ? fmt_datetime($r['decided_at']) : '-' ?></td>
-                                        <td>
-                                            <?php if ($r['status'] === 'approved' && !empty($r['proof_file'])): ?>
-                                                <button type="button" class="btn btn-sm btn-outline-primary"
-                                                    onclick="showProof('<?= htmlspecialchars($r['proof_file']) ?>')">
-                                                    Lihat
-                                                </button>
-                                            <?php else: ?>
-                                                -
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?= htmlspecialchars($r['admin_note'] ?? '') ?></td>
-                                    </tr>
-                                <?php endforeach;
-                                if (!$rows): ?>
-                                    <tr>
-                                        <td colspan="7" class="text-center text-muted">Belum ada pengajuan.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
     <script src="assets/js/pwa.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/slideToggle.min.js"></script>
@@ -349,12 +310,22 @@ $rows = $st->fetchAll();
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <?php if ($__flash = flash_get()): ?>
-        <script>
-            const Toast = Swal.mixin({ toast: true, position: 'bottom-end', showConfirmButton: false, timer: 3000, timerProgressBar: true });
-            const FLASH = <?= json_encode($__flash, JSON_UNESCAPED_UNICODE) ?>;
-            Toast.fire({ icon: (FLASH && FLASH.type) ? FLASH.type : 'info', title: (FLASH && FLASH.text) ? FLASH.text : '' });
-        </script>
+            <script>
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                const FLASH = <?= json_encode($__flash, JSON_UNESCAPED_UNICODE) ?>;
+                Toast.fire({
+                    icon: (FLASH && FLASH.type) ? FLASH.type : 'info',
+                    title: (FLASH && FLASH.text) ? FLASH.text : ''
+                });
+            </script>
     <?php endif; ?>
+
     <script>
         function showProof(url) {
             if (!url) {
@@ -370,12 +341,10 @@ $rows = $st->fetchAll();
             const isPdf = /\.pdf$/i.test(url);
 
             if (isImage) {
-                // Buat elemen <img> baru khusus untuk viewer ini
                 const img = new Image();
                 img.src = url;
                 img.alt = 'Bukti Transfer';
 
-                // Bikin viewer baru setiap kali, lalu destroy saat ditutup
                 let viewer = new Viewer(img, {
                     toolbar: true,
                     navbar: false,
@@ -394,7 +363,6 @@ $rows = $st->fetchAll();
 
                 viewer.show();
             } else if (isPdf) {
-                // Untuk PDF masih simpel: buka di tab baru
                 window.open(url, '_blank');
             } else {
                 if (window.Swal) {

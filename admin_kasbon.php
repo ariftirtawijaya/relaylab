@@ -3,6 +3,7 @@ require_once __DIR__ . '/app/auth.php';
 require_once __DIR__ . '/app/db.php';
 require_once __DIR__ . '/app/helpers.php';
 require_once __DIR__ . '/app/upload.php';
+require_once __DIR__ . '/app/kasbon.php';
 require_role('admin');
 
 $adminId = me_id();
@@ -11,7 +12,12 @@ $adminId = me_id();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id'] ?? 0);
     // Ambil kasbon
-    $st = pdo()->prepare("SELECT ca.*, u.name FROM cash_advances ca JOIN users u ON u.id=ca.user_id WHERE ca.id=? LIMIT 1");
+    $st = pdo()->prepare("
+        SELECT ca.*, u.name, u.salary, u.max_cash_advance_pct 
+        FROM cash_advances ca 
+        JOIN users u ON u.id=ca.user_id 
+        WHERE ca.id=? LIMIT 1
+    ");
     $st->execute([$id]);
     $row = $st->fetch();
     if (!$row) {
@@ -23,7 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Tolak
     if (isset($_POST['reject'])) {
         $note = trim($_POST['admin_note'] ?? '');
-        $st = pdo()->prepare("UPDATE cash_advances SET status='rejected', decided_at=?, decided_by=?, admin_note=? WHERE id=?");
+        $st = pdo()->prepare("
+            UPDATE cash_advances 
+               SET status='rejected', decided_at=?, decided_by=?, admin_note=? 
+             WHERE id=?
+        ");
         $st->execute([date('Y-m-d H:i:s'), $adminId, $note, $id]);
         flash_set('success', 'Pengajuan ditolak.');
         header('Location: ' . url('/admin_kasbon.php'));
@@ -34,15 +44,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['approve'])) {
         $note = trim($_POST['admin_note'] ?? '');
         try {
-            // set status approved dulu agar dapat id pasti? (id sudah ada)
-            // upload proof
             $proof = kasbon_upload_proof($_FILES['proof'] ?? [], $id);
             if (!$proof) {
                 flash_set('error', 'Wajib unggah bukti transfer (JPG/PNG/WEBP/PDF).');
                 header('Location: ' . url('/admin_kasbon.php'));
                 exit;
             }
-            $st = pdo()->prepare("UPDATE cash_advances SET status='approved', decided_at=?, decided_by=?, admin_note=?, proof_file=? WHERE id=?");
+            $st = pdo()->prepare("
+                UPDATE cash_advances 
+                   SET status='approved', decided_at=?, decided_by=?, admin_note=?, proof_file=? 
+                 WHERE id=?
+            ");
             $st->execute([date('Y-m-d H:i:s'), $adminId, $note, $proof, $id]);
             flash_set('success', 'Pengajuan disetujui & bukti tersimpan.');
         } catch (Throwable $e) {
@@ -65,11 +77,13 @@ if ($filter !== 'all') {
 }
 
 // list kasbon
-$sql = "SELECT ca.*, u.name, u.employee_id
-        FROM cash_advances ca
-        JOIN users u ON u.id=ca.user_id
-        $where
-        ORDER BY ca.id DESC";
+$sql = "
+    SELECT ca.*, u.name, u.employee_id, u.salary, u.max_cash_advance_pct
+    FROM cash_advances ca
+    JOIN users u ON u.id=ca.user_id
+    $where
+    ORDER BY ca.id DESC
+";
 $st = pdo()->prepare($sql);
 $st->execute($params);
 $rows = $st->fetchAll();
@@ -125,12 +139,36 @@ $rows = $st->fetchAll();
                         <th>Status</th>
                         <th>Diajukan</th>
                         <th>Diputuskan</th>
+                        <th>Limit Bln Ini</th>
                         <th>Bukti</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($rows as $r): ?>
+                        <?php
+                        $salary = isset($r['salary']) ? (int) $r['salary'] : 0;
+                        $pct = isset($r['max_cash_advance_pct']) ? (int) $r['max_cash_advance_pct'] : 20;
+                        if ($pct < 0)
+                            $pct = 0;
+                        if ($pct > 100)
+                            $pct = 100;
+
+                        // bulan referensi: untuk approved → pakai bulan decided_at, untuk pending/rejected → bulan sekarang
+                        if (!empty($r['decided_at'])) {
+                            $ym = substr($r['decided_at'], 0, 7); // Y-m
+                        } else {
+                            $ym = date('Y-m');
+                        }
+
+                        $limit = $salary > 0 ? (int) floor($salary * $pct / 100) : 0;
+                        $used = $salary > 0 ? kasbon_total_approved_month((int) $r['user_id'], $ym) : 0;
+                        $remain = max(0, $limit - $used);
+
+                        $willExceed = ($r['status'] === 'pending'
+                            && $salary > 0
+                            && (int) $r['amount'] > $remain);
+                        ?>
                         <tr>
                             <td><?= (int) $r['id'] ?></td>
                             <td><?= htmlspecialchars($r['employee_id'] . ' — ' . $r['name']) ?></td>
@@ -146,11 +184,29 @@ $rows = $st->fetchAll();
                             </td>
                             <td><?= fmt_datetime($r['requested_at']) ?></td>
                             <td><?= $r['decided_at'] ? fmt_datetime($r['decided_at']) : '-' ?></td>
+                            <td class="small">
+                                <?php if ($salary <= 0): ?>
+                                    <span class="text-muted">Gaji blm diset</span>
+                                <?php else: ?>
+                                    <div><strong>Periode:</strong> <?= htmlspecialchars($ym) ?></div>
+                                    <div>Gaji: Rp <?= number_format($salary, 0, ',', '.') ?></div>
+                                    <div>Batas (<?= $pct ?>%): Rp <?= number_format($limit, 0, ',', '.') ?></div>
+                                    <div>Terpakai: Rp <?= number_format($used, 0, ',', '.') ?></div>
+                                    <div>Sisa: Rp <?= number_format($remain, 0, ',', '.') ?></div>
+                                    <?php if ($willExceed): ?>
+                                        <span class="badge bg-danger mt-1">
+                                            Jika ACC akan melebihi limit
+                                        </span>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
                             <td class="w-proof">
                                 <?php if (!empty($r['proof_file'])): ?>
                                     <a class="btn btn-sm btn-outline-primary" href="<?= htmlspecialchars($r['proof_file']) ?>"
                                         target="_blank">Lihat</a>
-                                <?php else: ?>-<?php endif; ?>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
                             </td>
                             <td style="min-width:260px">
                                 <?php if ($r['status'] === 'pending'): ?>
@@ -161,10 +217,13 @@ $rows = $st->fetchAll();
                                         <div class="d-flex gap-1">
                                             <input type="file" class="form-control form-control-sm" name="proof"
                                                 accept=".jpg,.jpeg,.png,.webp,.pdf">
-                                            <button class="btn btn-sm btn-success" name="approve" value="1">ACC +
-                                                Upload</button>
+                                            <button class="btn btn-sm btn-success" name="approve" value="1">
+                                                ACC + Upload
+                                            </button>
                                             <button class="btn btn-sm btn-outline-danger" name="reject" value="1"
-                                                onclick="return confirm('Tolak pengajuan ini?')">Tolak</button>
+                                                onclick="return confirm('Tolak pengajuan ini?')">
+                                                Tolak
+                                            </button>
                                         </div>
                                     </form>
                                 <?php else: ?>
@@ -175,7 +234,7 @@ $rows = $st->fetchAll();
                     <?php endforeach;
                     if (!$rows): ?>
                         <tr>
-                            <td colspan="8" class="text-center text-muted">Tidak ada data.</td>
+                            <td colspan="9" class="text-center text-muted">Tidak ada data.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -186,9 +245,18 @@ $rows = $st->fetchAll();
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <?php if ($__flash = flash_get()): ?>
         <script>
-            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true });
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
             const FLASH = <?= json_encode($__flash, JSON_UNESCAPED_UNICODE) ?>;
-            Toast.fire({ icon: (FLASH && FLASH.type) ? FLASH.type : 'info', title: (FLASH && FLASH.text) ? FLASH.text : '' });
+            Toast.fire({
+                icon: (FLASH && FLASH.type) ? FLASH.type : 'info',
+                title: (FLASH && FLASH.text) ? FLASH.text : ''
+            });
         </script>
     <?php endif; ?>
 </body>
