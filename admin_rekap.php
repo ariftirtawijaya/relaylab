@@ -8,7 +8,7 @@ require_role('admin');
 
 $mode = $_GET['mode'] ?? 'month';               // month|week|day
 $bulan = preg_replace('/[^0-9\-]/', '', $_GET['bulan'] ?? date('Y-m')); // untuk mode=month
-$tgl = preg_replace('/[^0-9\-]/', '', $_GET['tgl'] ?? date('Y-m-d')); // untuk mode=week/day
+$tgl = preg_replace('/[^0-9\-]/', '', $_GET['tgl'] ?? date('Y-m-d'));   // untuk mode=week/day
 $emp = trim($_GET['emp'] ?? '');               // employee_id (opsional)
 
 // Tentukan rentang periode
@@ -48,7 +48,8 @@ foreach ($rows as $r) {
   $in = $r['in_time'] ? new DateTime($r['in_time']) : null;
   $out = $r['out_time'] ? new DateTime($r['out_time']) : null;
 
-  $late_h = $in ? calc_late_hours($in) : 0;
+  // TELAT: versi baru pakai menit
+  $late_min = $in ? calc_late_minutes($in) : 0;
 
   // LEMBUR: pakai fungsi record-aware (hari biasa vs Minggu)
   $ot_min = calc_overtime_minutes_record($d, $r['in_time'], $r['out_time']);
@@ -56,21 +57,23 @@ foreach ($rows as $r) {
   // MULTIPLIER: per user + per tanggal (dari tabel overtime_multiplier)
   $mult = ot_get_multiplier((int) $r['user_id'], $d);
 
-  $fine = $late_h * LATE_FINE_PER_H;
+  // Potongan telat
+  $fine = $in ? calc_late_fine($in) : 0;
+
   $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult);
   $net = $otpay - $fine;
 
   $key = $r['employee_id'] . '|' . $r['name'];
   if (!isset($summary[$key])) {
     $summary[$key] = [
-      'late_h' => 0,
+      'late_min' => 0,
       'fine' => 0,
       'ot_min' => 0,
       'otpay' => 0,
       'net' => 0,
     ];
   }
-  $summary[$key]['late_h'] += $late_h;
+  $summary[$key]['late_min'] += $late_min;
   $summary[$key]['fine'] += $fine;
   $summary[$key]['ot_min'] += $ot_min;
   $summary[$key]['otpay'] += $otpay;
@@ -82,7 +85,7 @@ foreach ($rows as $r) {
     'date' => $d,
     'in_time' => $r['in_time'] ?: null,
     'out_time' => $r['out_time'] ?: null,
-    'late_h' => $late_h,
+    'late_min' => $late_min,
     'fine' => $fine,
     'ot_min' => $ot_min,
     'mult' => $mult,
@@ -108,7 +111,7 @@ foreach ($rows as $r) {
         <a class="btn btn-outline-primary" href="<?= url('/admin_employees.php') ?>">Kelola Pegawai</a>
         <a class="btn btn-outline-primary" href="<?= url('/admin_absen.php') ?>">Absenkan</a>
         <a class="btn btn-outline-primary" href="<?= url('/admin_ot_multiplier.php') ?>">Multiplier Lembur</a>
-        <a class="btn btn-outline-primary" href <?= url('/admin_time.php') ?>">Simulasi Waktu</a>
+        <a class="btn btn-outline-primary" href="<?= url('/admin_time.php') ?>">Simulasi Waktu</a>
         <a class="btn btn-outline-secondary" href="<?= url('/logout.php') ?>">Logout</a>
       </div>
     </div>
@@ -182,7 +185,7 @@ foreach ($rows as $r) {
             <th>Tanggal</th>
             <th>In</th>
             <th>Out</th>
-            <th>Telat (jam)</th>
+            <th>Telat</th>
             <th>Pot. Telat</th>
             <th>Lembur</th>
             <th>Mult</th>
@@ -203,7 +206,7 @@ foreach ($rows as $r) {
                 <td><?= fmt_date($d['date']) ?></td>
                 <td><?= fmt_time($d['in_time']) ?></td>
                 <td><?= fmt_time($d['out_time']) ?></td>
-                <td><?= $d['late_h'] ?></td>
+                <td><?= fmt_minutes_jam_menit($d['late_min']) ?></td>
                 <td><?= number_format($d['fine'], 0, ',', '.') ?></td>
                 <td><?= fmt_duration_hm($d['ot_min']) ?></td>
                 <td>x<?= rtrim(rtrim(number_format($d['mult'], 2, ',', '.'), '0'), ',') ?></td>
@@ -222,7 +225,7 @@ foreach ($rows as $r) {
           <tr>
             <th>ID</th>
             <th>Nama</th>
-            <th>Total Telat (jam)</th>
+            <th>Total Telat</th>
             <th>Total Potongan</th>
             <th>Total Lembur</th>
             <th>Total Upah Lembur</th>
@@ -240,7 +243,7 @@ foreach ($rows as $r) {
               <tr>
                 <td><?= htmlspecialchars($eid) ?></td>
                 <td><?= htmlspecialchars($nm) ?></td>
-                <td><?= $s['late_h'] ?></td>
+                <td><?= fmt_minutes_jam_menit($s['late_min']) ?></td>
                 <td><?= number_format($s['fine'], 0, ',', '.') ?></td>
                 <td><?= fmt_duration_hm($s['ot_min']) ?></td>
                 <td><?= number_format($s['otpay'], 0, ',', '.') ?></td>

@@ -25,26 +25,29 @@ $st->execute($params);
 $rows = $st->fetchAll();
 
 $detail = [];
-$tot_late_h = $tot_fine = $tot_ot_min = $tot_otpay = 0;
+$tot_late_min = $tot_fine = $tot_ot_min = $tot_otpay = 0;
 
 foreach ($rows as $r) {
     $d = $r['work_date'];
     $in = $r['in_time'] ? new DateTime($r['in_time']) : null;
     $out = $r['out_time'] ? new DateTime($r['out_time']) : null;
 
-    $late_h = $in ? calc_late_hours($in) : 0;
+    // TELAT: versi baru pakai menit
+    $late_min = $in ? calc_late_minutes($in) : 0;
 
     // LEMBUR: pakai fungsi record-aware (hari biasa vs Minggu)
     $ot_min = calc_overtime_minutes_record($d, $r['in_time'], $r['out_time']);
 
-    // MULTIPLIER: per user + per tanggal
+    // MULTIPLIER lembur per user + per tanggal
     $mult = ot_get_multiplier($uid, $d);
 
-    $fine = $late_h * LATE_FINE_PER_H;
+    // Potongan telat pakai menit
+    $fine = $in ? calc_late_fine($in) : 0;
+
     $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult);
     $net = $otpay - $fine;
 
-    $tot_late_h += $late_h;
+    $tot_late_min += $late_min;
     $tot_fine += $fine;
     $tot_ot_min += $ot_min;
     $tot_otpay += $otpay;
@@ -53,7 +56,7 @@ foreach ($rows as $r) {
         'date' => $d,
         'in_time' => $r['in_time'],
         'out_time' => $r['out_time'],
-        'late_h' => $late_h,
+        'late_min' => $late_min,
         'fine' => $fine,
         'ot_min' => $ot_min,
         'mult' => $mult,
@@ -63,7 +66,7 @@ foreach ($rows as $r) {
 }
 
 $summary = [
-    'late_h' => $tot_late_h,
+    'late_min' => $tot_late_min,
     'fine' => $tot_fine,
     'ot_min' => $tot_ot_min,
     'otpay' => $tot_otpay,
@@ -170,7 +173,7 @@ $summary = [
                                     <th class="text-nowrap">Tanggal</th>
                                     <th class="text-nowrap">Masuk</th>
                                     <th class="text-nowrap">Keluar</th>
-                                    <th class="text-nowrap">Telat (jam)</th>
+                                    <th class="text-nowrap">Telat</th>
                                     <th class="text-nowrap">Potongan</th>
                                     <th class="text-nowrap">Lembur</th>
                                     <th class="text-nowrap">Dikali</th>
@@ -189,7 +192,7 @@ $summary = [
                                             <td class="text-nowrap"><?= fmt_date($d['date']) ?></td>
                                             <td class="text-nowrap"><?= fmt_time($d['in_time']) ?></td>
                                             <td class="text-nowrap"><?= fmt_time($d['out_time']) ?></td>
-                                            <td class="text-nowrap"><?= $d['late_h'] ?></td>
+                                            <td class="text-nowrap"><?= fmt_minutes_jam_menit($d['late_min']) ?></td>
                                             <td class="text-nowrap"><?= number_format($d['fine'], 0, ',', '.') ?></td>
                                             <td class="text-nowrap"><?= fmt_duration_hm($d['ot_min']) ?></td>
                                             <td class="text-nowrap">
@@ -217,8 +220,8 @@ $summary = [
                     <h5 class="mt-4">Ringkasan</h5>
                     <table class="table table-sm table-bordered" style="max-width:600px">
                         <tr>
-                            <th>Total Telat (jam)</th>
-                            <td><?= $summary['late_h'] ?></td>
+                            <th>Total Telat</th>
+                            <td><?= fmt_minutes_jam_menit($summary['late_min']) ?></td>
                         </tr>
                         <tr>
                             <th>Total Potongan</th>

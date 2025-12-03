@@ -19,6 +19,25 @@ function fmt_datetime(?string $dt): string
     }
 }
 
+/** Format menit menjadi "X Jam Y Menit" */
+function fmt_minutes_jam_menit(int $min): string
+{
+    if ($min <= 0)
+        return '0 Menit';
+
+    $h = intdiv($min, 60);
+    $m = $min % 60;
+
+    if ($h > 0 && $m > 0) {
+        return "{$h} Jam {$m} Menit";
+    } elseif ($h > 0 && $m == 0) {
+        return "{$h} Jam";
+    } else {
+        return "{$m} Menit";
+    }
+}
+
+
 /** Format tanggal saja ke d-m-Y */
 function fmt_date(?string $d): string
 {
@@ -80,27 +99,33 @@ function is_sunday(string $ymd): bool
     }
 }
 
-/** Hitung jam telat dari in_time (DateTime) terhadap aturan. */
-function calc_late_hours(DateTime $in): int
+function calc_late_minutes(DateTime $in): int
 {
     $d = $in->format('Y-m-d');
+    $start = new DateTime("$d 08:00:00");    // jam kerja
+    $toleransi = new DateTime("$d 08:30:00"); // toleransi 15 menit
 
-    // Jika Minggu, tidak ada telat
-    if (is_sunday($d))
-        return 0;
+    if ($in <= $toleransi) {
+        return 0; // tidak telat
+    }
 
-    $ontimeLimit = new DateTime("$d " . ONTIME_LIMIT);  // 08:59:59
-    if ($in <= $ontimeLimit)
-        return 0;
-
-    $lateBase = new DateTime("$d " . LATE_BASE);        // 09:00:00
-    if ($in < $lateBase)
-        return 0;
-
-    $diffSec = $in->getTimestamp() - $lateBase->getTimestamp();
-    $hours = intdiv($diffSec, 3600); // jam penuh setelah 09:00
-    return 1 + $hours;               // 09:00:00 → 1 jam telat
+    // hitung telat dalam menit sejak 08:00
+    $telatSec = $in->getTimestamp() - $start->getTimestamp();
+    return intdiv($telatSec, 60); // bulat menit
 }
+
+function calc_late_fine(DateTime $in): int
+{
+    $min = calc_late_minutes($in);
+    if ($min <= 0)
+        return 0;
+
+    $finePerHour = 10000;
+    $finePerMin = $finePerHour / 60; // 166.666...
+
+    return (int) floor($min * $finePerMin);
+}
+
 
 /**
  * Hitung total menit lembur per record (memperhitungkan hari Minggu).
