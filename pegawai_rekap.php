@@ -34,10 +34,12 @@ foreach ($rows as $r) {
 
     $late_h = $in ? calc_late_hours($in) : 0;
 
-    // === LEMBUR: pakai fungsi record-aware (hari biasa vs Minggu) ===
+    // LEMBUR: pakai fungsi record-aware (hari biasa vs Minggu)
     $ot_min = calc_overtime_minutes_record($d, $r['in_time'], $r['out_time']);
 
-    $mult = ot_get_multiplier($r['work_date']);
+    // MULTIPLIER: per user + per tanggal
+    $mult = ot_get_multiplier($uid, $d);
+
     $fine = $late_h * LATE_FINE_PER_H;
     $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult);
     $net = $otpay - $fine;
@@ -195,7 +197,8 @@ $summary = [
                                             </td>
                                             <td class="text-nowrap"><?= number_format($d['otpay'], 0, ',', '.') ?></td>
                                             <td class="text-nowrap">
-                                                <strong><?= number_format($d['net'], 0, ',', '.') ?></strong></td>
+                                                <strong><?= number_format($d['net'], 0, ',', '.') ?></strong>
+                                            </td>
                                         </tr>
                                     <?php endforeach; endif; ?>
                             </tbody>
@@ -246,19 +249,19 @@ $summary = [
             <div class="footer-nav position-relative">
                 <ul class="h-100 d-flex align-items-center justify-content-between ps-0">
                     <li>
-                        <a href="/pegawai.php">
+                        <a href="<?= url('/pegawai.php') ?>">
                             <i class="bi bi-house"></i>
                             <span>Beranda</span>
                         </a>
                     </li>
                     <li class="active">
-                        <a href="/pegawai_rekap.php">
+                        <a href="<?= url('/pegawai_rekap.php') ?>">
                             <i class="bi bi-calendar2-check"></i>
                             <span>Rekap</span>
                         </a>
                     </li>
                     <li>
-                        <a href="/settings.php">
+                        <a href="<?= url('/settings.php') ?>">
                             <i class="bi bi-person"></i>
                             <span>Profil</span>
                         </a>

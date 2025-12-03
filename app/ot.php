@@ -1,27 +1,35 @@
 <?php
+// app/ot.php
 require_once __DIR__ . '/db.php';
 
-/** Ambil multiplier untuk tanggal (string Y-m-d atau DateTime). Default 1.0 jika tidak ada. */
-function ot_get_multiplier($date): float
+/**
+ * Ambil multiplier lembur untuk user & tanggal tertentu.
+ * - Jika ada di tabel overtime_multiplier → pakai nilai tersebut.
+ * - Jika tidak ada → default 1.0
+ * - Jika nilai <= 0 → dianggap 0 (tidak dibayar lemburnya).
+ */
+function ot_get_multiplier(int $userId, string $ymd): float
 {
-    if ($date instanceof DateTime) {
-        $d = $date->format('Y-m-d');
-    } else {
-        $d = (string) $date;
-    }
-    $st = pdo()->prepare("SELECT multiplier FROM overtime_days WHERE work_date=? LIMIT 1");
-    $st->execute([$d]);
-    $row = $st->fetch();
-    if ($row && isset($row['multiplier'])) {
-        $m = floatval($row['multiplier']);
-        return ($m > 0) ? $m : 1.0;
+    try {
+        $pdo = pdo();
+        $st = $pdo->prepare("
+            SELECT multiplier 
+            FROM overtime_multiplier 
+            WHERE user_id = ? AND work_date = ? 
+            LIMIT 1
+        ");
+        $st->execute([$userId, $ymd]);
+        $row = $st->fetch();
+        if ($row) {
+            $val = (float) $row['multiplier'];
+            if ($val <= 0) {
+                return 0.0;
+            }
+            return $val;
+        }
+    } catch (Throwable $e) {
+        // fallback kalau ada error DB
+        error_log('ot_get_multiplier error: ' . $e->getMessage());
     }
     return 1.0;
-}
-
-/** Ambil semua hari multiplier (untuk admin list). */
-function ot_list(): array
-{
-    $st = pdo()->query("SELECT work_date, multiplier, note FROM overtime_days ORDER BY work_date DESC");
-    return $st->fetchAll();
 }

@@ -49,16 +49,27 @@ foreach ($rows as $r) {
   $out = $r['out_time'] ? new DateTime($r['out_time']) : null;
 
   $late_h = $in ? calc_late_hours($in) : 0;
-  $ot_min = $out ? calc_overtime_minutes($out) : 0;
 
-  $mult = ot_get_multiplier($d); // <-- multiplier per tanggal
+  // LEMBUR: pakai fungsi record-aware (hari biasa vs Minggu)
+  $ot_min = calc_overtime_minutes_record($d, $r['in_time'], $r['out_time']);
+
+  // MULTIPLIER: per user + per tanggal (dari tabel overtime_multiplier)
+  $mult = ot_get_multiplier((int) $r['user_id'], $d);
+
   $fine = $late_h * LATE_FINE_PER_H;
-  $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult); // pakai multiplier
+  $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult);
   $net = $otpay - $fine;
 
   $key = $r['employee_id'] . '|' . $r['name'];
-  if (!isset($summary[$key]))
-    $summary[$key] = ['late_h' => 0, 'fine' => 0, 'ot_min' => 0, 'otpay' => 0, 'net' => 0];
+  if (!isset($summary[$key])) {
+    $summary[$key] = [
+      'late_h' => 0,
+      'fine' => 0,
+      'ot_min' => 0,
+      'otpay' => 0,
+      'net' => 0,
+    ];
+  }
   $summary[$key]['late_h'] += $late_h;
   $summary[$key]['fine'] += $fine;
   $summary[$key]['ot_min'] += $ot_min;
@@ -96,7 +107,8 @@ foreach ($rows as $r) {
       <div class="d-flex gap-2">
         <a class="btn btn-outline-primary" href="<?= url('/admin_employees.php') ?>">Kelola Pegawai</a>
         <a class="btn btn-outline-primary" href="<?= url('/admin_absen.php') ?>">Absenkan</a>
-        <a class="btn btn-outline-primary" href="<?= url('/admin_time.php') ?>">Simulasi Waktu</a>
+        <a class="btn btn-outline-primary" href="<?= url('/admin_ot_multiplier.php') ?>">Multiplier Lembur</a>
+        <a class="btn btn-outline-primary" href <?= url('/admin_time.php') ?>">Simulasi Waktu</a>
         <a class="btn btn-outline-secondary" href="<?= url('/logout.php') ?>">Logout</a>
       </div>
     </div>
@@ -127,7 +139,6 @@ foreach ($rows as $r) {
           <label class="form-label">Bulan</label>
           <input type="month" name="bulan" class="form-control" value="<?= htmlspecialchars($bulan) ?>"
             onchange="this.form.submit()">
-
         </div>
       <?php else: ?>
         <div class="col-md-3">
@@ -136,7 +147,6 @@ foreach ($rows as $r) {
             onchange="this.form.submit()">
           <?php if ($mode === 'week'): ?>
             <small class="text-muted"><?= htmlspecialchars($period_label) ?></small>
-
           <?php endif; ?>
         </div>
       <?php endif; ?>
@@ -183,7 +193,7 @@ foreach ($rows as $r) {
         <tbody>
           <?php if (!$detail): ?>
             <tr>
-              <td colspan="10" class="text-center text-muted">Tidak ada data.</td>
+              <td colspan="11" class="text-center text-muted">Tidak ada data.</td>
             </tr>
           <?php else:
             foreach ($detail as $d): ?>
@@ -210,13 +220,13 @@ foreach ($rows as $r) {
       <table class="table table-sm table-bordered align-middle">
         <thead>
           <tr>
-            <th class="text-center">No</th>
-            <th class="text-center">Nama</th>
-            <th class="text-center">Total Telat (jam)</th>
-            <th class="text-center">Total Potongan</th>
-            <th class="text-center">Total Lembur</th>
-            <th class="text-center">Total Upah Lembur</th>
-            <th class="text-center"><strong>Netto</strong></th>
+            <th>ID</th>
+            <th>Nama</th>
+            <th>Total Telat (jam)</th>
+            <th>Total Potongan</th>
+            <th>Total Lembur</th>
+            <th>Total Upah Lembur</th>
+            <th><strong>Netto</strong></th>
           </tr>
         </thead>
         <tbody>
@@ -225,29 +235,19 @@ foreach ($rows as $r) {
               <td colspan="7" class="text-center text-muted">Tidak ada data.</td>
             </tr>
           <?php else:
-            $total = 0;
-            $no = 1;
             foreach ($summary as $k => $s):
-              $total += $s['net'];
               list($eid, $nm) = explode('|', $k, 2); ?>
               <tr>
-                <td class="text-center"><?= $no++ ?></td>
-                <td class="text-center"><?= htmlspecialchars($nm) ?></td>
-                <td class="text-center"><?= $s['late_h'] ?></td>
-                <td class="text-center"><?= number_format($s['fine'], 0, ',', '.') ?></td>
-                <td class="text-center"><?= fmt_duration_hm($s['ot_min']) ?></td>
-                <td class="text-center"><?= number_format($s['otpay'], 0, ',', '.') ?></td>
-                <td class="text-center"><strong><?= number_format($s['net'], 0, ',', '.') ?></strong>
-                </td>
+                <td><?= htmlspecialchars($eid) ?></td>
+                <td><?= htmlspecialchars($nm) ?></td>
+                <td><?= $s['late_h'] ?></td>
+                <td><?= number_format($s['fine'], 0, ',', '.') ?></td>
+                <td><?= fmt_duration_hm($s['ot_min']) ?></td>
+                <td><?= number_format($s['otpay'], 0, ',', '.') ?></td>
+                <td><strong><?= number_format($s['net'], 0, ',', '.') ?></strong></td>
               </tr>
             <?php endforeach; endif; ?>
         </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="6" class="text-center"><strong>Total</strong></td>
-            <td class="text-center"><strong><?= number_format($total, 0, ',', '.') ?></strong></td>
-          </tr>
-        </tfoot>
       </table>
     </div>
   </div>
@@ -255,7 +255,7 @@ foreach ($rows as $r) {
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <?php if ($__flash = flash_get()): ?>
     <script>
-      const Toast = Swal.mixin({ toast: true, position: 'bottom-end', showConfirmButton: false, timer: 2500, timerProgressBar: true });
+      const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2500, timerProgressBar: true });
       Toast.fire({ icon: '<?= htmlspecialchars($__flash['type']) ?>', title: '<?= htmlspecialchars($__flash['text']) ?>' });
     </script>
   <?php endif; ?>

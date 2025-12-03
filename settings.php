@@ -92,7 +92,7 @@ require_role('pegawai');
             <div class="card mb-3 shadow-sm">
                 <div class="card-body direction-rtl">
                     <div class="single-setting-panel">
-                        <a href="/pegawai_password.php">
+                        <a href="pegawai_password.php">
                             <div class="icon-wrapper bg-info">
                                 <i class="bi bi-lock"></i>
                             </div>
@@ -100,7 +100,7 @@ require_role('pegawai');
                         </a>
                     </div>
                     <div class="single-setting-panel">
-                        <a href="/pegawai_kasbon.php">
+                        <a href="pegawai_kasbon.php">
                             <div class="icon-wrapper bg-info">
                                 <i class="bi bi-cash"></i>
                             </div>
@@ -108,7 +108,7 @@ require_role('pegawai');
                         </a>
                     </div>
                     <div class="single-setting-panel">
-                        <a href="/logout.php">
+                        <a href="logout.php">
                             <div class="icon-wrapper bg-danger">
                                 <i class="bi bi-box-arrow-right"></i>
                             </div>
@@ -127,20 +127,20 @@ require_role('pegawai');
             <div class="footer-nav position-relative">
                 <ul class="h-100 d-flex align-items-center justify-content-between ps-0">
                     <li>
-                        <a href="/pegawai.php">
+                        <a href="<?= url('/pegawai.php') ?>">
                             <i class="bi bi-house"></i>
                             <span>Beranda</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="/pegawai_rekap.php">
+                        <a href="<?= url('/pegawai_rekap.php') ?>">
                             <i class=" bi bi-calendar2-check"></i>
                             <span>Rekap</span>
                         </a>
                     </li>
                     <li class="active">
-                        <a href="/settings.php">
+                        <a href="<?= url('/settings.php') ?>">
                             <i class=" bi bi-person"></i>
                             <span>Profil</span>
                         </a>
