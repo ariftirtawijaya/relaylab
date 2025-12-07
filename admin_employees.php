@@ -105,6 +105,7 @@ $rows = pdo()->query("SELECT * FROM users ORDER BY role='admin' DESC, name ASC")
                 <a class="btn btn-outline-primary" href="<?= url('/admin_time.php') ?>">Simulasi Waktu</a>
                 <a class="btn btn-outline-primary" href="<?= url('/admin_locations.php') ?>">Lokasi</a>
                 <a class="btn btn-outline-primary" href="<?= url('/admin_kasbon.php') ?>">Kasbon</a>
+                <a class="btn btn-outline-primary" href="<?= url('/admin_leave.php') ?>">Izin / Sakit</a>
                 <a class="btn btn-outline-secondary" href="<?= url('/logout.php') ?>">Logout</a>
             </div>
         </div>

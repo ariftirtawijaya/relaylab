@@ -4,6 +4,8 @@ require_once __DIR__ . '/app/db.php';
 require_once __DIR__ . '/app/helpers.php';
 require_once __DIR__ . '/app/time.php';
 require_once __DIR__ . '/app/ot.php';
+require_once __DIR__ . '/app/leave.php';
+
 require_role('pegawai');
 
 $mode = $_GET['mode'] ?? 'month';               // month|week|day
@@ -32,8 +34,17 @@ foreach ($rows as $r) {
     $in = $r['in_time'] ? new DateTime($r['in_time']) : null;
     $out = $r['out_time'] ? new DateTime($r['out_time']) : null;
 
-    // TELAT: versi baru pakai menit
-    $late_min = $in ? calc_late_minutes($in) : 0;
+    $leave = leave_get_status($uid, $d);
+
+    if ($leave) {
+        // Jika izin/sakit, maka telat & potongan = 0
+        $late_min = 0;
+        $fine = 0;
+    } else {
+        $late_min = $in ? calc_late_minutes($in) : 0;
+        $fine = $in ? calc_late_fine($in) : 0;
+    }
+
 
     // LEMBUR: pakai fungsi record-aware (hari biasa vs Minggu)
     $ot_min = calc_overtime_minutes_record($d, $r['in_time'], $r['out_time']);
@@ -41,8 +52,6 @@ foreach ($rows as $r) {
     // MULTIPLIER lembur per user + per tanggal
     $mult = ot_get_multiplier($uid, $d);
 
-    // Potongan telat pakai menit
-    $fine = $in ? calc_late_fine($in) : 0;
 
     $otpay = round(($ot_min / 60) * intval($r['overtime_rate']) * $mult);
     $net = $otpay - $fine;
