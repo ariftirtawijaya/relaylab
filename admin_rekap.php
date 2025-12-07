@@ -223,13 +223,13 @@ foreach ($rows as $r) {
       <table class="table table-sm table-bordered align-middle">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Nama</th>
-            <th>Total Telat</th>
-            <th>Total Potongan</th>
-            <th>Total Lembur</th>
-            <th>Total Upah Lembur</th>
-            <th><strong>Netto</strong></th>
+            <th class="text-center">ID</th>
+            <th class="text-center">Nama</th>
+            <th class="text-center">Total Telat</th>
+            <th class="text-center">Total Potongan</th>
+            <th class="text-center">Total Lembur</th>
+            <th class="text-center">Total Upah Lembur</th>
+            <th class="text-center"><strong>Netto</strong></th>
           </tr>
         </thead>
         <tbody>
@@ -238,19 +238,28 @@ foreach ($rows as $r) {
               <td colspan="7" class="text-center text-muted">Tidak ada data.</td>
             </tr>
           <?php else:
+            $jumTot = 0;
             foreach ($summary as $k => $s):
+              $jumTot += $s['net'];
               list($eid, $nm) = explode('|', $k, 2); ?>
               <tr>
-                <td><?= htmlspecialchars($eid) ?></td>
-                <td><?= htmlspecialchars($nm) ?></td>
-                <td><?= fmt_minutes_jam_menit($s['late_min']) ?></td>
-                <td><?= number_format($s['fine'], 0, ',', '.') ?></td>
-                <td><?= fmt_duration_hm($s['ot_min']) ?></td>
-                <td><?= number_format($s['otpay'], 0, ',', '.') ?></td>
-                <td><strong><?= number_format($s['net'], 0, ',', '.') ?></strong></td>
+                <td class="text-center"><?= htmlspecialchars($eid) ?></td>
+                <td class="text-center"><?= htmlspecialchars($nm) ?></td>
+                <td class="text-center"><?= fmt_minutes_jam_menit($s['late_min']) ?></td>
+                <td class="text-center"><?= number_format($s['fine'], 0, ',', '.') ?></td>
+                <td class="text-center"><?= fmt_duration_hm($s['ot_min']) ?></td>
+                <td class="text-center"><?= number_format($s['otpay'], 0, ',', '.') ?></td>
+                <td class="text-center"><strong><?= number_format($s['net'], 0, ',', '.') ?></strong></td>
               </tr>
-            <?php endforeach; endif; ?>
-        </tbody>
+            <?php endforeach; ?>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="6" class="text-center"><Strong>Jumlah Total</Strong></td>
+              <td class="text-center"><strong><?= number_format($jumTot, 0, ',', '.') ?></strong></td>
+            </tr>
+          </tfoot>
+        <?php endif; ?>
       </table>
     </div>
   </div>

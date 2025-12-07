@@ -107,32 +107,33 @@ function mail_admin_kasbon_new(string $empName, string $empId, int $amount, stri
  */
 function telegram_send_text(string $text): void
 {
-    if (empty(TELEGRAM_BOT_TOKEN) || empty(TELEGRAM_ADMIN_CHAT_ID)) {
+    if (empty(TELEGRAM_BOT_TOKEN) || empty(TELEGRAM_ADMIN_CHAT_IDS)) {
         return;
     }
 
-    $payload = [
-        'chat_id' => TELEGRAM_ADMIN_CHAT_ID,
-        'text' => $text,
-    ];
-
     $url = 'https://api.telegram.org/bot' . TELEGRAM_BOT_TOKEN . '/sendMessage';
 
-    try {
-        $options = [
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
-                'content' => http_build_query($payload),
-                'timeout' => 10,
-            ],
-        ];
-        $context = stream_context_create($options);
-        $result = @file_get_contents($url, false, $context);
+    foreach (TELEGRAM_ADMIN_CHAT_IDS as $chatId) {
 
-        if ($result === false) {
-            // Fallback cURL
-            if (function_exists('curl_init')) {
+        $payload = [
+            'chat_id' => $chatId,
+            'text' => $text,
+        ];
+
+        try {
+            $options = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+                    'content' => http_build_query($payload),
+                    'timeout' => 10,
+                ],
+            ];
+
+            $context = stream_context_create($options);
+            $result = @file_get_contents($url, false, $context);
+
+            if ($result === false && function_exists('curl_init')) {
                 $ch = curl_init($url);
                 curl_setopt_array($ch, [
                     CURLOPT_POST => true,
@@ -141,29 +142,15 @@ function telegram_send_text(string $text): void
                     CURLOPT_TIMEOUT => 10,
                 ]);
                 $res = curl_exec($ch);
-                if ($res === false) {
-                    error_log('Telegram cURL error: ' . curl_error($ch));
-                } else {
-                    $data = json_decode($res, true);
-                    if (!isset($data['ok']) || !$data['ok']) {
-                        error_log('Telegram error (curl): ' . ($data['description'] ?? 'unknown'));
-                    }
-                }
                 curl_close($ch);
-            } else {
-                error_log('Telegram error: file_get_contents & cURL gagal / tidak tersedia.');
             }
-        } else {
-            $data = json_decode($result, true);
-            if (!isset($data['ok']) || !$data['ok']) {
-                error_log('Telegram error: ' . ($data['description'] ?? 'unknown'));
-            }
-        }
 
-    } catch (Throwable $e) {
-        error_log('Telegram exception: ' . $e->getMessage());
+        } catch (Throwable $e) {
+            error_log('Telegram exception: ' . $e->getMessage());
+        }
     }
 }
+
 
 /* ============================================================
  *  TELEGRAM: Notifikasi Kasbon

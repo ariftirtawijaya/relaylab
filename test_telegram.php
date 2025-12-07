@@ -5,60 +5,78 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/app/config.php';
 
-$token   = TELEGRAM_BOT_TOKEN;
-$chatId  = TELEGRAM_ADMIN_CHAT_ID;
+$token = TELEGRAM_BOT_TOKEN;
+$admins = TELEGRAM_ADMIN_CHAT_IDS; // array chat_id
+
+if (empty($token) || empty($admins) || !is_array($admins)) {
+    die("<p><strong>Config error:</strong> TOKEN atau daftar chat_id belum di-set dengan benar.</p>");
+}
 
 $text = "🔔 *Test Notifikasi Telegram*\n"
-      . "Ini hanya pesan percobaan dari sistem kasbon.\n"
-      . "Waktu: " . date('d-m-Y H:i:s');
-
-$payload = [
-    'chat_id'    => $chatId,
-    'text'       => $text,
-    'parse_mode' => 'Markdown',
-];
+    . "Pesan percobaan dari sistem RelayLab.\n"
+    . "Waktu: " . date('d-m-Y H:i:s');
 
 $url = 'https://api.telegram.org/bot' . $token . '/sendMessage';
 
-echo "<h3>Test Kirim Telegram</h3>";
+echo "<h3>Test Kirim Telegram ke Banyak Admin</h3>";
 
-try {
-    $options = [
-        'http' => [
-            'method'  => 'POST',
-            'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
-            'content' => http_build_query($payload),
-            'timeout' => 10,
-        ],
+foreach ($admins as $chatId) {
+
+    echo "<h4>Mengirim ke Chat ID: {$chatId}</h4>";
+
+    $payload = [
+        'chat_id' => $chatId,
+        'text' => $text,
+        'parse_mode' => 'Markdown',
     ];
-    $context = stream_context_create($options);
-    $result  = @file_get_contents($url, false, $context);
 
-    if ($result === false) {
-        echo "<p><strong>file_get_contents gagal.</strong> Coba ulangi dengan cURL...</p>";
+    try {
+        // Coba file_get_contents
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+                'content' => http_build_query($payload),
+                'timeout' => 10,
+            ]
+        ]);
 
-        if (function_exists('curl_init')) {
-            $ch = curl_init($url);
-            curl_setopt_array($ch, [
-                CURLOPT_POST           => true,
-                CURLOPT_POSTFIELDS     => http_build_query($payload),
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT        => 10,
-            ]);
-            $res = curl_exec($ch);
-            if ($res === false) {
-                echo "<p><strong>cURL error:</strong> " . htmlspecialchars(curl_error($ch)) . "</p>";
+        $result = @file_get_contents($url, false, $context);
+
+        if ($result === false) {
+            echo "<p><strong>file_get_contents gagal.</strong> Coba cURL...</p>";
+
+            if (function_exists('curl_init')) {
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [
+                    CURLOPT_POST => true,
+                    CURLOPT_POSTFIELDS => http_build_query($payload),
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 10,
+                ]);
+
+                $res = curl_exec($ch);
+
+                if ($res === false) {
+                    echo "<pre><strong>cURL Error:</strong> " . htmlspecialchars(curl_error($ch)) . "</pre>";
+                } else {
+                    echo "<pre>Response cURL:\n" . htmlspecialchars($res) . "</pre>";
+                }
+
+                curl_close($ch);
             } else {
-                echo "<pre>Response cURL:\n" . htmlspecialchars($res) . "</pre>";
+                echo "<p>cURL tidak tersedia di server.</p>";
             }
-            curl_close($ch);
+
         } else {
-            echo "<p>cURL tidak tersedia di server.</p>";
+            echo "<pre>Response:\n" . htmlspecialchars($result) . "</pre>";
         }
-    } else {
-        echo "<pre>Response:\n" . htmlspecialchars($result) . "</pre>";
+
+    } catch (Throwable $e) {
+        echo "<p><strong>Exception:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
     }
 
-} catch (Throwable $e) {
-    echo "<p><strong>Exception:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "<hr>";
 }
+
+echo "<p>✔️ Selesai mengirim ke semua admin.</p>";
