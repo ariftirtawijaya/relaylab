@@ -213,11 +213,74 @@ function telegram_notify_attendance(string $eventType, string $empName, string $
 
     $text = "Presensi Pegawai\n";
     $text .= "Jenis   : {$jenis}\n";
-    $text .= "Pegawai : {$empName} ({$empId})\n";
+    $text .= "Pegawai : {$empName}\n";
     $text .= "Waktu   : {$dt}\n";
     if ($extra) {
         $text .= "Info    : {$extra}\n";
     }
 
     telegram_send_text($text);
+}
+
+function whatsapp_send_text(string $text): void
+{
+    try {
+        $token = "yNuNwRkmU8L4YDyF1NQi";   // Ganti dengan token Fonnte Anda
+        $group_id = "120363424390701667@g.us";    // Ganti dengan ID Group WhatsApp, format: 628xxxxxxx-xxxxx@g.us
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => $group_id,
+                'message' => $text,
+            ),
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: ' . $token
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $error = curl_error($curl);
+        curl_close($curl);
+    } catch (Throwable $e) {
+        error_log('Whatsapp exception: ' . $e->getMessage());
+    }
+
+}
+
+
+function whatsapp_notify_attendance(string $eventType, string $empName, string $empId, string $datetime, ?string $extra = null): void
+{
+    if (!$empName && !$empId) {
+        return;
+    }
+
+    // $eventType: 'in' atau 'out'
+    $jenis = ($eventType === 'out') ? 'Absen Pulang' : 'Absen Masuk';
+
+    try {
+        $dt = (new DateTime($datetime))->format('d-m-Y H:i:s');
+    } catch (Throwable $e) {
+        $dt = $datetime;
+    }
+
+    $text = "Presensi Pegawai\n";
+    $text .= "Jenis   : {$jenis}\n";
+    $text .= "Pegawai : {$empName}\n";
+
+    $text .= "Waktu   : {$dt}\n";
+    if ($extra) {
+        $text .= "Info    : {$extra}\n";
+    }
+
+    whatsapp_send_text($text);
 }
