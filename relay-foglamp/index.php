@@ -6,6 +6,18 @@
     <title>Panduan Pemasangan Relay Set Biled Foglamp - RelayLab Autolight</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- SEO basic -->
+    <meta name="description"
+        content="Panduan lengkap pemasangan Relay Set BiLED Foglamp RelayLab Autolight. Cocok untuk mobil trigger positif maupun negatif, H4, H11 + HB3, dan headlamp LED bawaan pabrik." />
+
+    <!-- Open Graph / WhatsApp preview -->
+    <meta property="og:title" content="Panduan Pemasangan Relay Set Biled Foglamp" />
+    <meta property="og:site_name" content="RelayLab Autolight" />
+    <meta property="og:description"
+        content="Panduan langkah demi langkah pemasangan relay set BiLED foglamp RelayLab. Termasuk pengaturan kabel PUTIH & KUNING untuk High Beam, kompatibel berbagai jenis headlamp." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://relaylab.id/relay-foglamp" />
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
