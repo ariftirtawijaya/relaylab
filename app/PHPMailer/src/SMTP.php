@@ -79,7 +79,7 @@ class SMTP
     const MAX_REPLY_LENGTH = 512;
 
     /**
-     * Debug level for no output.
+     * Debug level for no Output.
      *
      * @var int
      */
@@ -114,23 +114,23 @@ class SMTP
     const DEBUG_LOWLEVEL = 4;
 
     /**
-     * Debug output level.
+     * Debug Output level.
      * Options:
-     * * self::DEBUG_OFF (`0`) No debug output, default
+     * * self::DEBUG_OFF (`0`) No debug Output, default
      * * self::DEBUG_CLIENT (`1`) Client commands
      * * self::DEBUG_SERVER (`2`) Client commands and server responses
      * * self::DEBUG_CONNECTION (`3`) As DEBUG_SERVER plus connection status
-     * * self::DEBUG_LOWLEVEL (`4`) Low-level data output, all messages.
+     * * self::DEBUG_LOWLEVEL (`4`) Low-level data Output, all messages.
      *
      * @var int
      */
     public $do_debug = self::DEBUG_OFF;
 
     /**
-     * How to handle debug output.
+     * How to handle debug Output.
      * Options:
      * * `echo` Output plain-text as-is, appropriate for CLI
-     * * `html` Output escaped, line breaks converted to `<br>`, appropriate for browser output
+     * * `html` Output escaped, line breaks converted to `<br>`, appropriate for browser Output
      * * `error_log` Output to error log as configured in php.ini
      * Alternatively, you can provide a callable expecting two params: a message string and the debug level:
      *
@@ -139,7 +139,7 @@ class SMTP
      * ```
      *
      * Alternatively, you can pass in an instance of a PSR-3 compatible logger, though only `debug`
-     * level output is used:
+     * level Output is used:
      *
      * ```php
      * $mail->Debugoutput = new myPsr3Logger;
@@ -217,7 +217,14 @@ class SMTP
      * @var array
      */
     public static $xclient_allowed_attributes = [
-        'NAME', 'ADDR', 'PORT', 'PROTO', 'HELO', 'LOGIN', 'DESTADDR', 'DESTPORT'
+        'NAME',
+        'ADDR',
+        'PORT',
+        'PROTO',
+        'HELO',
+        'LOGIN',
+        'DESTADDR',
+        'DESTPORT'
     ];
 
     /**
@@ -277,7 +284,7 @@ class SMTP
     /**
      * Output debugging info via a user-selected method.
      *
-     * @param string $str   Debug string to output
+     * @param string $str   Debug string to Output
      * @param int    $level The debug level of this message; see DEBUG_* constants
      *
      * @see SMTP::$Debugoutput
@@ -303,12 +310,12 @@ class SMTP
         }
         switch ($this->Debugoutput) {
             case 'error_log':
-                //Don't output, just log
+                //Don't Output, just log
                 /** @noinspection ForgottenDebugOutputInspection */
                 error_log($str);
                 break;
             case 'html':
-                //Cleans up output a bit for a better looking, HTML-safe output
+                //Cleans up Output a bit for a better looking, HTML-safe Output
                 echo gmdate('Y-m-d H:i:s'), ' ', htmlentities(
                     preg_replace('/[\r\n]+/', '', $str),
                     ENT_QUOTES,
@@ -320,17 +327,17 @@ class SMTP
                 //Normalize line breaks
                 $str = preg_replace('/\r\n|\r/m', "\n", $str);
                 echo gmdate('Y-m-d H:i:s'),
-                "\t",
+                    "\t",
                     //Trim trailing space
-                trim(
-                    //Indent for readability, except for trailing break
-                    str_replace(
-                        "\n",
-                        "\n                   \t                  ",
-                        trim($str)
-                    )
-                ),
-                "\n";
+                    trim(
+                        //Indent for readability, except for trailing break
+                        str_replace(
+                            "\n",
+                            "\n                   \t                  ",
+                            trim($str)
+                        )
+                    ),
+                    "\n";
         }
     }
 
@@ -377,7 +384,7 @@ class SMTP
         //Get any announcement
         $this->last_reply = $this->get_lines();
         $this->edebug('SERVER -> CLIENT: ' . $this->last_reply, self::DEBUG_SERVER);
-        $responseCode = (int)substr($this->last_reply, 0, 3);
+        $responseCode = (int) substr($this->last_reply, 0, 3);
         if ($responseCode === 220) {
             return true;
         }
@@ -466,7 +473,7 @@ class SMTP
         //SMTP server can take longer to respond, give longer timeout for first read
         //Windows does not have support for this timeout function
         if (strpos(PHP_OS, 'WIN') !== 0) {
-            $max = (int)ini_get('max_execution_time');
+            $max = (int) ini_get('max_execution_time');
             //Don't bother if unlimited, or if set_time_limit is disabled
             if (0 !== $max && $timeout > $max && strpos(ini_get('disable_functions'), 'set_time_limit') === false) {
                 @set_time_limit($timeout);
@@ -499,9 +506,9 @@ class SMTP
         }
 
         //Begin encrypted connection
-            set_error_handler(function () {
-                call_user_func_array([$this, 'errorHandler'], func_get_args());
-            });
+        set_error_handler(function () {
+            call_user_func_array([$this, 'errorHandler'], func_get_args());
+        });
         $crypto_ok = stream_socket_enable_crypto(
             $this->smtp_conn,
             true,
@@ -1204,13 +1211,13 @@ class SMTP
      * Send raw data to the server.
      *
      * @param string $data    The data to send
-     * @param string $command Optionally, the command this is part of, used only for controlling debug output
+     * @param string $command Optionally, the command this is part of, used only for controlling debug Output
      *
      * @return int|bool The number of bytes sent to the server or false on error
      */
     public function client_send($data, $command = '')
     {
-        //If SMTP transcripts are left enabled, or debug output is posted online
+        //If SMTP transcripts are left enabled, or debug Output is posted online
         //it can leak credentials, so hide credentials in all but lowest level
         if (
             self::DEBUG_LOWLEVEL > $this->do_debug &&
@@ -1462,9 +1469,9 @@ class SMTP
     }
 
     /**
-     * Set debug output method.
+     * Set debug Output method.
      *
-     * @param string|callable $method The name of the mechanism to use for debugging output, or a callable to handle it
+     * @param string|callable $method The name of the mechanism to use for debugging Output, or a callable to handle it
      */
     public function setDebugOutput($method = 'echo')
     {
@@ -1472,7 +1479,7 @@ class SMTP
     }
 
     /**
-     * Get debug output method.
+     * Get debug Output method.
      *
      * @return string
      */
@@ -1482,7 +1489,7 @@ class SMTP
     }
 
     /**
-     * Set debug output level.
+     * Set debug Output level.
      *
      * @param int $level
      */
@@ -1492,7 +1499,7 @@ class SMTP
     }
 
     /**
-     * Get debug output level.
+     * Get debug Output level.
      *
      * @return int
      */

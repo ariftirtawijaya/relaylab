@@ -63,10 +63,10 @@ class POP3
     const DEFAULT_TIMEOUT = 30;
 
     /**
-     * POP3 class debug output mode.
-     * Debug output level.
+     * POP3 class debug Output mode.
+     * Debug Output level.
      * Options:
-     * @see POP3::DEBUG_OFF: No output
+     * @see POP3::DEBUG_OFF: No Output
      * @see POP3::DEBUG_SERVER: Server messages, connection/server errors
      * @see POP3::DEBUG_CLIENT: Client and Server messages, connection/server errors
      *
@@ -136,7 +136,7 @@ class POP3
     const LE = "\r\n";
 
     /**
-     * Debug level for no output.
+     * Debug level for no Output.
      *
      * @var int
      */
@@ -364,7 +364,7 @@ class POP3
 
         // Clean up attributes.
         $this->connected = false;
-        $this->pop_conn  = false;
+        $this->pop_conn = false;
     }
 
     /**
@@ -425,7 +425,7 @@ class POP3
 
     /**
      * Add an error to the internal error store.
-     * Also display debug output if it's enabled.
+     * Also display debug Output if it's enabled.
      *
      * @param string $error
      */

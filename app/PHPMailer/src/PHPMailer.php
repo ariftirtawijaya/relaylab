@@ -392,14 +392,14 @@ class PHPMailer
     public $dsn = '';
 
     /**
-     * SMTP class debug output mode.
-     * Debug output level.
+     * SMTP class debug Output mode.
+     * Debug Output level.
      * Options:
-     * @see SMTP::DEBUG_OFF: No output
+     * @see SMTP::DEBUG_OFF: No Output
      * @see SMTP::DEBUG_CLIENT: Client messages
      * @see SMTP::DEBUG_SERVER: Client and server messages
      * @see SMTP::DEBUG_CONNECTION: As SERVER plus connection status
-     * @see SMTP::DEBUG_LOWLEVEL: Noisy, low-level data output, rarely needed
+     * @see SMTP::DEBUG_LOWLEVEL: Noisy, low-level data Output, rarely needed
      *
      * @see SMTP::$do_debug
      *
@@ -408,10 +408,10 @@ class PHPMailer
     public $SMTPDebug = 0;
 
     /**
-     * How to handle debug output.
+     * How to handle debug Output.
      * Options:
      * * `echo` Output plain-text as-is, appropriate for CLI
-     * * `html` Output escaped, line breaks converted to `<br>`, appropriate for browser output
+     * * `html` Output escaped, line breaks converted to `<br>`, appropriate for browser Output
      * * `error_log` Output to error log as configured in php.ini
      * By default PHPMailer will use `echo` if run from a `cli` or `cli-server` SAPI, `html` otherwise.
      * Alternatively, you can provide a callable expecting two params: a message string and the debug level:
@@ -421,7 +421,7 @@ class PHPMailer
      * ```
      *
      * Alternatively, you can pass in an instance of a PSR-3 compatible logger, though only `debug`
-     * level output is used:
+     * level Output is used:
      *
      * ```php
      * $mail->Debugoutput = new myPsr3Logger;
@@ -846,7 +846,7 @@ class PHPMailer
         if (null !== $exceptions) {
             $this->exceptions = (bool) $exceptions;
         }
-        //Pick an appropriate debug output format automatically
+        //Pick an appropriate debug Output format automatically
         $this->Debugoutput = (strpos(PHP_SAPI, 'cli') !== false ? 'echo' : 'html');
     }
 
@@ -876,7 +876,7 @@ class PHPMailer
     private function mailPassthru($to, $subject, $body, $header, $params)
     {
         //Check overloading of mail function to avoid double-encoding
-        if ((int)ini_get('mbstring.func_overload') & 1) {
+        if ((int) ini_get('mbstring.func_overload') & 1) {
             $subject = $this->secureHeader($subject);
         } else {
             $subject = $this->encodeHeader($this->secureHeader($subject));
@@ -900,7 +900,7 @@ class PHPMailer
 
     /**
      * Output debugging info via a user-defined method.
-     * Only generates output if debug output is enabled.
+     * Only generates Output if debug Output is enabled.
      *
      * @see PHPMailer::$Debugoutput
      * @see PHPMailer::$SMTPDebug
@@ -926,12 +926,12 @@ class PHPMailer
         }
         switch ($this->Debugoutput) {
             case 'error_log':
-                //Don't output, just log
+                //Don't Output, just log
                 /** @noinspection ForgottenDebugOutputInspection */
                 error_log($str);
                 break;
             case 'html':
-                //Cleans up output a bit for a better looking, HTML-safe output
+                //Cleans up Output a bit for a better looking, HTML-safe Output
                 echo htmlentities(
                     preg_replace('/[\r\n]+/', '', $str),
                     ENT_QUOTES,
@@ -943,17 +943,17 @@ class PHPMailer
                 //Normalize line breaks
                 $str = preg_replace('/\r\n|\r/m', "\n", $str);
                 echo gmdate('Y-m-d H:i:s'),
-                "\t",
+                    "\t",
                     //Trim trailing space
-                trim(
-                    //Indent for readability, except for trailing break
-                    str_replace(
-                        "\n",
-                        "\n                   \t                  ",
-                        trim($str)
-                    )
-                ),
-                "\n";
+                    trim(
+                        //Indent for readability, except for trailing break
+                        str_replace(
+                            "\n",
+                            "\n                   \t                  ",
+                            trim($str)
+                        )
+                    ),
+                    "\n";
         }
     }
 
@@ -1342,7 +1342,7 @@ class PHPMailer
      */
     private static function parseEmailString($input)
     {
-        $input = trim((string)$input);
+        $input = trim((string) $input);
 
         if ($input === '') {
             return ['name' => '', 'email' => ''];
@@ -1354,10 +1354,10 @@ class PHPMailer
             // Double quotes including special scenarios.
             if (isset($matches[1]) && $matches[1] !== '') {
                 $name = $matches[1];
-            // Single quotes including special scenarios.
+                // Single quotes including special scenarios.
             } elseif (isset($matches[2]) && $matches[2] !== '') {
                 $name = $matches[2];
-            // Simplest scenario, name and email are in the format "Name <email>".
+                // Simplest scenario, name and email are in the format "Name <email>".
             } elseif (isset($matches[3])) {
                 $name = trim($matches[3]);
             }
@@ -1385,14 +1385,14 @@ class PHPMailer
             //Helps avoid a deprecation warning in the preg_replace() below
             $name = '';
         }
-        $address = trim((string)$address);
+        $address = trim((string) $address);
         $name = trim(preg_replace('/[\r\n]+/', '', $name)); //Strip breaks and trim
         //Don't validate now addresses with IDN. Will be done in send().
         $pos = strrpos($address, '@');
         if (
             (false === $pos)
             || ((!$this->has8bitChars(substr($address, ++$pos)) || !static::idnSupported())
-            && !static::validateAddress($address))
+                && !static::validateAddress($address))
         ) {
             $error_message = sprintf(
                 '%s (From): %s',
@@ -1578,7 +1578,7 @@ class PHPMailer
                     $punycode = idn_to_ascii(
                         $domain,
                         \IDNA_DEFAULT | \IDNA_USE_STD3_RULES | \IDNA_CHECK_BIDI |
-                            \IDNA_CHECK_CONTEXTJ | \IDNA_NONTRANSITIONAL_TO_ASCII,
+                        \IDNA_CHECK_CONTEXTJ | \IDNA_NONTRANSITIONAL_TO_ASCII,
                         \INTL_IDNA_VARIANT_UTS46
                     );
                 } elseif (defined('INTL_IDNA_VARIANT_2003')) {
@@ -1668,9 +1668,9 @@ class PHPMailer
             if (
                 static::CHARSET_UTF8 === strtolower($this->CharSet) &&
                 ($this->anyAddressHasUnicodeLocalPart($this->RecipientsQueue) ||
-                 $this->anyAddressHasUnicodeLocalPart(array_keys($this->all_recipients)) ||
-                 $this->anyAddressHasUnicodeLocalPart($this->ReplyToQueue) ||
-                 $this->addressHasUnicodeLocalPart($this->From))
+                    $this->anyAddressHasUnicodeLocalPart(array_keys($this->all_recipients)) ||
+                    $this->anyAddressHasUnicodeLocalPart($this->ReplyToQueue) ||
+                    $this->addressHasUnicodeLocalPart($this->From))
             ) {
                 $this->UseSMTPUTF8 = true;
             }
@@ -2007,7 +2007,7 @@ class PHPMailer
         if (strpos($path, '\\\\') !== 0) {
             $readable = $readable && is_readable($path);
         }
-        return  $readable;
+        return $readable;
     }
 
     /**
@@ -2491,7 +2491,7 @@ class PHPMailer
 
         //Validate $langcode
         $foundlang = true;
-        $langcode  = strtolower($langcode);
+        $langcode = strtolower($langcode);
         if (
             !preg_match('/^(?P<lang>[a-z]{2})(?P<script>_[a-z]{4})?(?P<country>_[a-z]{2})?$/', $langcode, $matches)
             && $langcode !== 'en'
@@ -2544,7 +2544,7 @@ class PHPMailer
                         array_key_exists($matches[1], $PHPMAILER_LANG)
                     ) {
                         //Overwrite language-specific strings so we'll never have missing translation keys.
-                        $PHPMAILER_LANG[$matches[1]] = (string)$matches[3];
+                        $PHPMAILER_LANG[$matches[1]] = (string) $matches[3];
                     }
                 }
             }
@@ -3692,7 +3692,7 @@ class PHPMailer
             $maxlen = static::MAX_LINE_LENGTH - $overhead;
         }
 
-        //Select the encoding that produces the shortest output and/or prevents corruption.
+        //Select the encoding that produces the shortest Output and/or prevents corruption.
         if ($matchcount > strlen($str) / 3) {
             //More than 1/3 of the content needs encoding, use B-encode.
             $encoding = 'B';
@@ -3751,7 +3751,7 @@ class PHPMailer
         $hasEncodedWord = (bool) preg_match('/=\?.*\?=/s', $value);
         if ($hasEncodedWord && defined('MB_CASE_UPPER')) {
             $origCharset = mb_internal_encoding();
-            // Always decode to UTF-8 to provide a consistent, modern output encoding.
+            // Always decode to UTF-8 to provide a consistent, modern Output encoding.
             mb_internal_encoding($charset);
             if (PHP_VERSION_ID < 80300) {
                 // Undo any RFC2047-encoded spaces-as-underscores.
@@ -4291,7 +4291,7 @@ class PHPMailer
         foreach ($this->CustomHeader as $k => $pair) {
             if ($pair[0] == $name) {
                 // We remove the header if the value is not provided or it matches.
-                if (null === $value ||  $pair[1] == $value) {
+                if (null === $value || $pair[1] == $value) {
                     unset($this->CustomHeader[$k]);
                 }
             }
