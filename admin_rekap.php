@@ -52,7 +52,8 @@ foreach ($rows as $r) {
 
   $leave = leave_get_status((int) $r['user_id'], $d);
 
-  if ($leave) {
+  // Jika izin/sakit ATAU hari Minggu => telat & potongan = 0
+  if ($leave || is_sunday($d)) {
     $late_min = 0;
     $fine = 0;
   } else {
