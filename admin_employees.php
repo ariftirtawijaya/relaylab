@@ -75,15 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Hapus
-if (($_GET['del'] ?? '') !== '') {
-    $del = intval($_GET['del']);
-    pdo()->prepare("DELETE FROM users WHERE id=?")->execute([$del]);
-    flash_set('success', 'Pegawai dihapus.');
-    header('Location: ' . url('/admin_employees.php'));
-    exit;
-}
-
 $rows = pdo()->query("SELECT * FROM users ORDER BY role='admin' DESC, name ASC")->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -191,10 +182,15 @@ $rows = pdo()->query("SELECT * FROM users ORDER BY role='admin' DESC, name ASC")
                                         <td class="text-end">
                                             <button class="btn btn-sm btn-outline-primary"
                                                 onclick='fillForm(<?= json_encode($r, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>Edit</button>
-                                            <?php if ($r['role'] !== 'admin'): ?>
-                                                <a class="btn btn-sm btn-outline-danger" href="#"
-                                                    onclick="return confirmDel(<?= $r['id'] ?>)">Hapus</a>
-                                            <?php endif; ?>
+                                            <form method="post" action="<?= url('/admin_employee_delete.php') ?>"
+                                                onsubmit="return confirm('PERINGATAN!\n\nSemua data pegawai ini (absen, izin, kasbon, lembur) akan DIHAPUS PERMANEN.\n\nLanjutkan?')"
+                                                style="display:inline">
+                                                <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                                <button class="btn btn-sm btn-danger">
+                                                    Hapus
+                                                </button>
+                                            </form>
+
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
