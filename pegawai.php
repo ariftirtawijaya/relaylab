@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $now->format('Y-m-d H:i:s')
             );
              whatsapp_notify_attendance(
-                'in',
+                'out',
                 $user['name'] ?? '',
                 $user['employee_id'] ?? '',
                 $now->format('Y-m-d H:i:s')
